@@ -11,6 +11,8 @@ function judge = NearZero(near)
 % Output:
 % judge =
 %     1
-
 judge = norm(near) < 1e-6;
+if isa(judge, 'sym')
+    judge = isAlways(judge, 'Unknown', 'false');
+end
 end
