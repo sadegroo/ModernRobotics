@@ -18,5 +18,15 @@ function [omghat, theta] = AxisAng3(expc3)
 %    3.7417
 
 theta = norm(expc3);
+if isa(theta, 'sym')
+    % Symbolic norm() wraps real expressions in abs(), which pollutes all
+    % downstream results (e.g. sin(abs(th)) in MatrixExp3/MatrixExp6) unless
+    % the angles are assumed positive. Stripping abs() is exact here: it
+    % amounts to picking the opposite sign for theta, and omghat = expc3 /
+    % theta flips along with it, so the axis-angle pair stays consistent.
+    % simplify() first: norm() returns (abs(x)^2)^(1/2), which only
+    % collapses to abs(x) after simplification.
+    theta = mapSymType(simplify(theta), 'abs', @(x) children(x, 1));
+end
 omghat = expc3 / theta;
 end

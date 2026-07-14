@@ -25,5 +25,13 @@ theta = norm(expc6(1: 3));
 if NearZero(theta)
     theta = norm(expc6(4: 6));
 end
-S = expc6 / theta;      
+if isa(theta, 'sym')
+    % Symbolic norm() wraps real expressions in abs(); strip it so results
+    % stay clean without assuming positive angles. This just flips the sign
+    % convention of theta, and S = expc6 / theta flips consistently with it.
+    % simplify() first: norm() returns (abs(x)^2)^(1/2), which only
+    % collapses to abs(x) after simplification.
+    theta = mapSymType(simplify(theta), 'abs', @(x) children(x, 1));
+end
+S = expc6 / theta;
 end
